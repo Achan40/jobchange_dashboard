@@ -42,6 +42,7 @@ app.layout = html.Div([
     Input('education-dropdown','value')
 )
 def update_hist(selected_edu):
+    # .isin method will allow for multiple input selection
     filtered_jobdf = jobdf[jobdf['education_level'].isin(selected_edu)]
     fig = px.histogram(filtered_jobdf, x='education_level', color='target', barmode='group')
     return fig
