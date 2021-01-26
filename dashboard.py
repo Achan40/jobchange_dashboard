@@ -12,14 +12,15 @@ import plotly.graph_objects as go
 # Create pandas dataframe from cleaned data
 jobdf = pd.read_csv('cleaneddata.csv')
 
-# Items in dataset for gender column
-gender_options =  [{'label': i, 'value': i} for i in jobdf['gender'].unique()]
-
 # Items in dataset for education_level
 education_options =  [{'label': i, 'value': i} for i in jobdf['education_level'].unique()]
 
-# Items in dataset in relevant_experience column
-relevent_exp_options =  [{'label': i, 'value': i} for i in jobdf['relevent_experience'].unique()]
+# Items in dataset for column choice (pie chart selection)
+column_options =  [{'label': i, 'value': i} for i in ['major_discipline','gender','education_level']]
+
+# Items in dataset for value choice (pie chart selection)
+value_options = [{'label': i, 'value': i} for i in ['target','training_hours']]
+
 
 # Create Dash object
 app = dash.Dash()
@@ -33,7 +34,20 @@ app.layout = html.Div([
         # All values of education_level will be selected by default
         value=list(jobdf['education_level'].unique())
     ),
-    dcc.Graph(id='hist-edu-chart')
+    dcc.Graph(id='hist-edu-chart'),
+    html.P('Names:'),
+    dcc.Dropdown(
+        id='column-dropdown',
+        options=column_options,
+        clearable=False
+    ),
+    html.P('Values:'),
+    dcc.Dropdown(
+        id='value-dropdown',
+        options=value_options,
+        clearable=False
+    ),
+    dcc.Graph(id='multi-pi-chart')
 ])
 
 # Visiualizing distribution of job searchers depending on education level
@@ -47,6 +61,15 @@ def update_hist(selected_edu):
     fig = px.histogram(filtered_jobdf, x='education_level', color='target', barmode='group')
     return fig
 
-# Bar chart for relevent experience v searching for a position
+# Pie chart with multiple selections
+@app.callback(
+    Output('multi-pi-chart','figure'),
+    Input('column-dropdown','value'),
+    Input('value-dropdown','value'),
+)
+def generate_pie(option1,option2):
+    fig = px.pie(jobdf, values=option2, names=option1)
+    return fig
+
 if __name__ == '__main__':
     app.run_server(debug=True)
