@@ -35,19 +35,20 @@ app.layout = html.Div([
         value=list(jobdf['education_level'].unique())
     ),
     dcc.Graph(id='hist-edu-chart'),
-    html.P('Names:'),
+    html.P('Name:'),
     dcc.Dropdown(
         id='column-dropdown',
         options=column_options,
         clearable=False
     ),
-    html.P('Values:'),
+    html.P('Value:'),
     dcc.Dropdown(
         id='value-dropdown',
         options=value_options,
-        clearable=False
+        clearable=True
     ),
-    dcc.Graph(id='multi-pi-chart')
+    dcc.Graph(id='multi-pi-chart'),
+    html.Div(id='average-training-hours')
 ])
 
 # Visiualizing distribution of job searchers depending on education level
@@ -61,15 +62,28 @@ def update_hist(selected_edu):
     fig = px.histogram(filtered_jobdf, x='education_level', color='target', barmode='group')
     return fig
 
-# Pie chart with multiple selections
+# Pie chart with multiple selections and average training hours output for clicked element
 @app.callback(
     Output('multi-pi-chart','figure'),
+    Output('average-training-hours','children'),
     Input('column-dropdown','value'),
     Input('value-dropdown','value'),
+    Input('multi-pi-chart','clickData')
 )
-def generate_pie(option1,option2):
-    fig = px.pie(jobdf, values=option2, names=option1)
-    return fig
+def generate_pie(names,values,clicked_data):
+    # Pie chart generation
+    fig = px.pie(jobdf, values=values, names=names)
+    # Clicked data only works for px.pie(jobdf,values='training_hours', names=names)
+    # This is due to the nature of teh training_hours column
+    if clicked_data is None or values != 'training_hours':
+        return [fig,f'When Value is set to training_hours, click on a color!']
+    # Calculating average of selected data
+    selected_name = clicked_data['points'][0]['label']
+    # All rows for that selected_name given names
+    selected_avg_filter = jobdf.loc[jobdf[names] == selected_name]
+    # avg of the values column after filter
+    selected_avg = selected_avg_filter[[values]].mean()[0]
+    return fig, f'The average {values} for {names} is {selected_avg}'
 
 if __name__ == '__main__':
     app.run_server(debug=True)
