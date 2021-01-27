@@ -64,7 +64,7 @@ app.layout = html.Div([
             
             dcc.Graph(id='multi-pi-chart'),
             html.Div(id='average-training-hours'),
-        ],align="center")
+        ],width="auto")
     ])
 ])
 
