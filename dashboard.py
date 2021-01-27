@@ -7,7 +7,6 @@ from dash.dependencies import Input, Output
 
 import pandas as pd
 import plotly.express as px
-import plotly.graph_objects as go
 
 # Create pandas dataframe from cleaned data
 jobdf = pd.read_csv('cleaneddata.csv')
@@ -23,33 +22,44 @@ value_options = [{'label': i, 'value': i} for i in ['target','training_hours']]
 
 
 # Create Dash object
-app = dash.Dash()
+app = dash.Dash(
+    external_stylesheets=[dbc.themes.BOOTSTRAP]
+)
 
 app.layout = html.Div([
-    html.H1('This is a title'),
-    dcc.Dropdown(
-        id='education-dropdown',
-        options=education_options,
-        multi=True,
-        # All values of education_level will be selected by default
-        value=list(jobdf['education_level'].unique())
-    ),
-    dcc.Graph(id='hist-edu-chart'),
-    html.P('Name:'),
-    dcc.Dropdown(
-        id='column-dropdown',
-        options=column_options,
-        clearable=False
-    ),
-    html.P('Value:'),
-    dcc.Dropdown(
-        id='value-dropdown',
-        options=value_options,
-        clearable=True
-    ),
-    dcc.Graph(id='multi-pi-chart'),
-    html.Div(id='average-training-hours')
+    dbc.Row([
+        dbc.Col([
+            html.Div([
+                html.H1('Histogram'),
+            ], style = {'textAlign': 'center'}),
+            dcc.Dropdown(
+                id='education-dropdown',
+                options=education_options,
+                multi=True,
+                # All values of education_level will be selected by default
+                value=list(jobdf['education_level'].unique())
+            ),
+            dcc.Graph(id='hist-edu-chart'),
+        ],width="auto"),
+        dbc.Col([
+            html.P('Name:'),
+            dcc.Dropdown(
+                id='column-dropdown',
+                options=column_options,
+                clearable=False
+            ),
+            html.P('Value:'),
+            dcc.Dropdown(
+                id='value-dropdown',
+                options=value_options,
+                clearable=True
+            ),
+            dcc.Graph(id='multi-pi-chart'),
+            html.Div(id='average-training-hours'),
+        ],align="center")
+    ])
 ])
+
 
 # Visiualizing distribution of job searchers depending on education level
 @app.callback(
@@ -59,7 +69,7 @@ app.layout = html.Div([
 def update_hist(selected_edu):
     # .isin method will allow for multiple input selection
     filtered_jobdf = jobdf[jobdf['education_level'].isin(selected_edu)]
-    fig = px.histogram(filtered_jobdf, x='education_level', color='target', barmode='group')
+    fig = px.histogram(filtered_jobdf, x='education_level', color='target', barmode='group', labels={'education_level': 'Education Level','target': 'Searching for Job Change'})
     return fig
 
 # Pie chart with multiple selections and average training hours output for clicked element
