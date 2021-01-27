@@ -30,7 +30,7 @@ app.layout = html.Div([
     dbc.Row([
         dbc.Col([
             html.Div([
-                html.H1('Histogram'),
+                html.P('Histogram: Education Level v Searching for Job Change'),
             ], style = {'textAlign': 'center'}),
             dcc.Dropdown(
                 id='education-dropdown',
@@ -42,18 +42,26 @@ app.layout = html.Div([
             dcc.Graph(id='hist-edu-chart'),
         ],width="auto"),
         dbc.Col([
+            html.Div([
+                html.P('Pie Chart: User selected variables'),
+            ], style = {'textAlign': 'center'}),
             html.P('Name:'),
-            dcc.Dropdown(
-                id='column-dropdown',
-                options=column_options,
-                clearable=False
-            ),
+            html.Div([
+                dcc.Dropdown(
+                    id='column-dropdown',
+                    options=column_options,
+                    clearable=False
+                ),
+            ], style = {'textAlign': 'center'}),
             html.P('Value:'),
-            dcc.Dropdown(
-                id='value-dropdown',
-                options=value_options,
-                clearable=True
-            ),
+            html.Div([
+                dcc.Dropdown(
+                    id='value-dropdown',
+                    options=value_options,
+                    clearable=True
+                ),
+            ], style = {'textAlign': 'center'}),
+            
             dcc.Graph(id='multi-pi-chart'),
             html.Div(id='average-training-hours'),
         ],align="center")
