@@ -26,12 +26,23 @@ app = dash.Dash(
     external_stylesheets=[dbc.themes.BOOTSTRAP]
 )
 
-app.layout = html.Div([
-    dbc.Row([
-        dbc.Col([
-            html.Div([
-                html.P('Histogram: Education Level v Searching for Job Change'),
-            ], style = {'textAlign': 'center'}),
+# Function to add titles to graphs
+def cardTitle(sometext):
+    return html.Div([
+        dbc.Card(
+            dbc.CardBody([
+                html.Div([
+                    html.H4(sometext),
+                ], style={'textAlign': 'center'})
+            ])
+        )
+    ])
+
+# Create layout for first card
+card1 = dbc.Card(
+    dbc.CardBody([
+        cardTitle('Histogram: Education Level v Searching for Job Change'),
+        dbc.CardBody([
             dcc.Dropdown(
                 id='education-dropdown',
                 options=education_options,
@@ -40,11 +51,15 @@ app.layout = html.Div([
                 value=list(jobdf['education_level'].unique())
             ),
             dcc.Graph(id='hist-edu-chart'),
-        ],width="auto"),
-        dbc.Col([
-            html.Div([
-                html.P('Pie Chart: User selected variables'),
-            ], style = {'textAlign': 'center'}),
+        ])
+    ])
+)
+
+# Create layout for second card
+card2 = dbc.Card(
+    dbc.CardBody([
+        cardTitle('Pie Chart: User selected variables'),
+        dbc.CardBody([
             html.P('Name:'),
             html.Div([
                 dcc.Dropdown(
@@ -61,13 +76,34 @@ app.layout = html.Div([
                     clearable=True
                 ),
             ], style = {'textAlign': 'center'}),
-            
             dcc.Graph(id='multi-pi-chart'),
             html.Div(id='average-training-hours'),
-        ],width="auto")
+        ])
+        
     ])
-])
+)
 
+# Generate layout
+app.layout = html.Div([
+    dbc.Card(
+        dbc.CardBody([
+            dbc.Row([
+                dbc.Col([
+                    card1
+                ],width="auto"),
+                dbc.Col([
+                    card2
+                ],width="auto")
+            ]),
+            html.Br(),
+            dbc.Row([
+                dbc.Col([
+                    cardTitle('This is a placeholder')
+                ])
+            ])
+        ])
+    )
+])
 
 # Visiualizing distribution of job searchers depending on education level
 @app.callback(
