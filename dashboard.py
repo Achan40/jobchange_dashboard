@@ -23,7 +23,7 @@ value_options = [{'label': i, 'value': i} for i in ['target','training_hours']]
 
 # Create Dash object
 app = dash.Dash(
-    external_stylesheets=[dbc.themes.BOOTSTRAP]
+    external_stylesheets=[dbc.themes.SLATE]
 )
 
 # Function to add titles to graphs
@@ -83,6 +83,16 @@ card2 = dbc.Card(
     ])
 )
 
+# Create layout for third card
+card3 = dbc.Card(
+    dbc.CardBody([
+        cardTitle('This is another card'),
+        dbc.CardBody([
+            
+        ])
+    ])
+)
+
 # Generate layout
 app.layout = html.Div([
     dbc.Card(
@@ -93,7 +103,10 @@ app.layout = html.Div([
                 ],width="auto"),
                 dbc.Col([
                     card2
-                ],width="auto")
+                ],width="auto"),
+                dbc.Col([
+                    card3
+                ],width="auto"),
             ]),
             html.Br(),
             dbc.Row([
@@ -101,7 +114,7 @@ app.layout = html.Div([
                     cardTitle('This is a placeholder')
                 ])
             ])
-        ])
+        ]), color="dark"
     )
 ])
 
