@@ -20,7 +20,6 @@ column_options =  [{'label': i, 'value': i} for i in ['major_discipline','gender
 # Items in dataset for value choice (pie chart selection)
 value_options = [{'label': i, 'value': i} for i in ['target','training_hours']]
 
-
 # Create Dash object
 app = dash.Dash(
     external_stylesheets=[dbc.themes.SLATE]
@@ -84,6 +83,7 @@ card2 = dbc.Card(
 )
 
 # Create layout for third card
+# df.query(city) this should be user selected, x = city dev index, y = training hours, size = experience, color = column options
 card3 = dbc.Card(
     dbc.CardBody([
         cardTitle('This is another card'),
@@ -152,5 +152,6 @@ def generate_pie(names,values,clicked_data):
     selected_avg = selected_avg_filter[[values]].mean()[0]
     return fig, f'The average {values} for {names} is {selected_avg}'
 
+# Scatter plot
 if __name__ == '__main__':
     app.run_server(debug=True)
