@@ -104,7 +104,8 @@ card3 = dbc.Card(
                 options=column_options,
             ),
             dcc.Graph(id='bubble-chart'),
-            dash_table.DataTable(id='bubble-info',columns=[{'name':col, 'id':col} for col in jobdf.columns])
+            html.P('Click on a color to see the corresponding data in the table'),
+            dash_table.DataTable(id='bubble-info',columns=[{'name':col, 'id':col} for col in jobdf.columns]),
         ])
     ])
 )
@@ -165,18 +166,29 @@ def generate_pie(names,values,clicked_data):
     selected_avg = selected_avg_filter[[values]].mean()[0]
     return fig, f'The average {values} for {names} is {selected_avg}'
 
-# Bubble Plot
+# Bubble Plot with data table
 @app.callback(
     Output('bubble-chart','figure'),
     Output('bubble-info','data'),
     Input('city-dropdown','value'),
     Input('column-dropdown-2','value'),
+    Input('bubble-chart','clickData')
 )
-def generate_bubble(city,color):
+def generate_bubble(city,color,clicked_data):
     fig = px.scatter(jobdf[jobdf['city'] == city], x='company_type',y='training_hours',size='experience',color=color, labels={'company_type': 'Company Type','training_hours': 'Training Hours'})
     # filter by city
     filtered_data = jobdf[jobdf['city'] == city]
-    return fig,filtered_data.to_dict('records')
+    # conditon so that data for city selection will appear without a click
+    if clicked_data is None or color is None:
+        return fig,filtered_data.to_dict('records')
+    else:
+        # Index of selected choice in selected color's unique value list
+        selected_color = clicked_data['points'][0]['curveNumber']
+        # Unique values of the selected color option
+        color_options =  filtered_data[color].unique()
+        # Filter data table by color clicked
+        filtered_data = filtered_data[filtered_data[color] == color_options[selected_color]]
+        return fig,filtered_data.to_dict('records')
 
 if __name__ == '__main__':
     app.run_server(debug=True)
