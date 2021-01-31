@@ -20,6 +20,9 @@ column_options =  [{'label': i, 'value': i} for i in ['major_discipline','gender
 # Items in dataset for value choice (pie chart selection)
 value_options = [{'label': i, 'value': i} for i in ['target','training_hours']]
 
+# Items in dataset for city selection (bubble chart)
+city_options = [{'label': i, 'value': i} for i in jobdf['city'].unique()]
+
 # Create Dash object
 app = dash.Dash(
     external_stylesheets=[dbc.themes.SLATE]
@@ -64,7 +67,8 @@ card2 = dbc.Card(
                 dcc.Dropdown(
                     id='column-dropdown',
                     options=column_options,
-                    clearable=False
+                    clearable=False,
+                    value='education_level',
                 ),
             ], style = {'textAlign': 'center'}),
             html.P('Value:'),
@@ -88,7 +92,19 @@ card3 = dbc.Card(
     dbc.CardBody([
         cardTitle('This is another card'),
         dbc.CardBody([
-            
+            html.P('City:'),
+            dcc.Dropdown(
+                id='city-dropdown',
+                options=city_options,
+                value='city_1',
+            ),
+            html.P('Color:'),
+            dcc.Dropdown(
+                id='column-dropdown-2',
+                options=column_options,
+            ),
+            dcc.Graph(id='bubble-chart'),
+            dash_table.DataTable(id='bubble-info',columns=[{'name':col, 'id':col} for col in jobdf.columns])
         ])
     ])
 )
@@ -100,19 +116,16 @@ app.layout = html.Div([
             dbc.Row([
                 dbc.Col([
                     card1
-                ],width="auto"),
+                ],width="6"),
                 dbc.Col([
                     card2
-                ],width="auto"),
-                dbc.Col([
-                    card3
-                ],width="auto"),
+                ],width="6"),
             ]),
             html.Br(),
             dbc.Row([
                 dbc.Col([
-                    cardTitle('This is a placeholder')
-                ])
+                    card3
+                ],width="12"),
             ])
         ]), color="dark"
     )
@@ -152,6 +165,18 @@ def generate_pie(names,values,clicked_data):
     selected_avg = selected_avg_filter[[values]].mean()[0]
     return fig, f'The average {values} for {names} is {selected_avg}'
 
-# Scatter plot
+# Bubble Plot
+@app.callback(
+    Output('bubble-chart','figure'),
+    Output('bubble-info','data'),
+    Input('city-dropdown','value'),
+    Input('column-dropdown-2','value'),
+)
+def generate_bubble(city,color):
+    fig = px.scatter(jobdf[jobdf['city'] == city], x='company_type',y='training_hours',size='experience',color=color, labels={'company_type': 'Company Type','training_hours': 'Training Hours'})
+    # filter by city
+    filtered_data = jobdf[jobdf['city'] == city]
+    return fig,filtered_data.to_dict('records')
+
 if __name__ == '__main__':
     app.run_server(debug=True)
