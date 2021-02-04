@@ -90,7 +90,7 @@ card2 = dbc.Card(
 # df.query(city) this should be user selected, x = city dev index, y = training hours, size = experience, color = column options
 card3 = dbc.Card(
     dbc.CardBody([
-        cardTitle('This is another card'),
+        cardTitle('Bubble Plot: User selected variables'),
         dbc.CardBody([
             html.P('City:'),
             dcc.Dropdown(
@@ -104,7 +104,7 @@ card3 = dbc.Card(
                 options=column_options,
             ),
             dcc.Graph(id='bubble-chart'),
-            html.P('Click on a color to see the corresponding data in the table'),
+            html.P('When a color variable has been selected, click on a bubble to see the corresponding data in the table'),
             dash_table.DataTable(id='bubble-info',columns=[{'name':col, 'id':col} for col in jobdf.columns]),
         ])
     ])
