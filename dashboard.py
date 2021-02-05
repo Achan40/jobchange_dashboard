@@ -25,7 +25,7 @@ city_options = [{'label': i, 'value': i} for i in jobdf['city'].unique()]
 
 # Create Dash object
 app = dash.Dash(
-    external_stylesheets=[dbc.themes.SLATE]
+    external_stylesheets=[dbc.themes.BOOTSTRAP]
 )
 
 # Function to add titles to graphs
@@ -128,7 +128,7 @@ app.layout = html.Div([
                     card3
                 ],width="12"),
             ])
-        ]), color="dark"
+        ]),color="dark"
     )
 ])
 
